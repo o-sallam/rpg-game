@@ -1,0 +1,324 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/UI/AbilityBar.cs" id="1_bar"]
+[ext_resource type="Script" path="res://scripts/UI/AbilitySlot.cs" id="2_slot"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_slot"]
+bg_color = Color(0.09, 0.1, 0.13, 0.8)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.35, 0.38, 0.45, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+; The ultimate gets a thicker gold frame so it reads as the important one.
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ult"]
+bg_color = Color(0.16, 0.11, 0.04, 0.85)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.95, 0.72, 0.24, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="LabelSettings" id="LabelSettings_key"]
+font_size = 16
+outline_size = 4
+outline_color = Color(0, 0, 0, 0.8)
+
+[sub_resource type="LabelSettings" id="LabelSettings_cd"]
+font_size = 22
+outline_size = 5
+outline_color = Color(0, 0, 0, 0.85)
+
+[sub_resource type="LabelSettings" id="LabelSettings_cd_ult"]
+font_size = 30
+outline_size = 6
+outline_color = Color(0, 0, 0, 0.85)
+
+[node name="AbilityBar" type="CanvasLayer"]
+script = ExtResource("1_bar")
+AbilitySystemPath = NodePath("")
+SlotContainerPath = NodePath("Anchor/Slots")
+
+; Bottom-centre, and resolution independent: anchors keep the bar centred on
+; both 16:10 and 16:9 rather than pinning it to one window size.
+[node name="Anchor" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -160.0
+offset_top = -104.0
+offset_right = 160.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+
+[node name="Slots" type="HBoxContainer" parent="Anchor"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+theme_override_constants/separation = 10
+mouse_filter = 2
+
+[node name="SlotQ" type="Panel" parent="Anchor/Slots"]
+custom_minimum_size = Vector2(58, 58)
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
+script = ExtResource("2_slot")
+Action = "ability_q"
+IconPath = NodePath("Icon")
+KeyLabelPath = NodePath("Key")
+CooldownLabelPath = NodePath("Cooldown")
+CooldownOverlayPath = NodePath("Overlay")
+
+[node name="Icon" type="ColorRect" parent="Anchor/Slots/SlotQ"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 5.0
+offset_top = 5.0
+offset_right = -5.0
+offset_bottom = -5.0
+mouse_filter = 2
+color = Color(0.28, 0.42, 0.62, 1)
+
+[node name="Overlay" type="ColorRect" parent="Anchor/Slots/SlotQ"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 5.0
+offset_top = 5.0
+offset_right = -5.0
+offset_bottom = -5.0
+mouse_filter = 2
+color = Color(0, 0, 0, 0.6)
+
+[node name="Key" type="Label" parent="Anchor/Slots/SlotQ"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 6.0
+offset_top = -26.0
+offset_right = 26.0
+offset_bottom = -4.0
+mouse_filter = 2
+text = "Q"
+label_settings = SubResource("LabelSettings_key")
+
+[node name="Cooldown" type="Label" parent="Anchor/Slots/SlotQ"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+text = "0"
+label_settings = SubResource("LabelSettings_cd")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SlotW" type="Panel" parent="Anchor/Slots"]
+custom_minimum_size = Vector2(58, 58)
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
+script = ExtResource("2_slot")
+Action = "ability_w"
+IconPath = NodePath("Icon")
+KeyLabelPath = NodePath("Key")
+CooldownLabelPath = NodePath("Cooldown")
+CooldownOverlayPath = NodePath("Overlay")
+
+[node name="Icon" type="ColorRect" parent="Anchor/Slots/SlotW"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 5.0
+offset_top = 5.0
+offset_right = -5.0
+offset_bottom = -5.0
+mouse_filter = 2
+color = Color(0.28, 0.42, 0.62, 1)
+
+[node name="Overlay" type="ColorRect" parent="Anchor/Slots/SlotW"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 5.0
+offset_top = 5.0
+offset_right = -5.0
+offset_bottom = -5.0
+mouse_filter = 2
+color = Color(0, 0, 0, 0.6)
+
+[node name="Key" type="Label" parent="Anchor/Slots/SlotW"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 6.0
+offset_top = -26.0
+offset_right = 26.0
+offset_bottom = -4.0
+mouse_filter = 2
+text = "W"
+label_settings = SubResource("LabelSettings_key")
+
+[node name="Cooldown" type="Label" parent="Anchor/Slots/SlotW"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+text = "0"
+label_settings = SubResource("LabelSettings_cd")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SlotE" type="Panel" parent="Anchor/Slots"]
+custom_minimum_size = Vector2(58, 58)
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
+script = ExtResource("2_slot")
+Action = "ability_e"
+IconPath = NodePath("Icon")
+KeyLabelPath = NodePath("Key")
+CooldownLabelPath = NodePath("Cooldown")
+CooldownOverlayPath = NodePath("Overlay")
+
+[node name="Icon" type="ColorRect" parent="Anchor/Slots/SlotE"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 5.0
+offset_top = 5.0
+offset_right = -5.0
+offset_bottom = -5.0
+mouse_filter = 2
+color = Color(0.28, 0.42, 0.62, 1)
+
+[node name="Overlay" type="ColorRect" parent="Anchor/Slots/SlotE"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 5.0
+offset_top = 5.0
+offset_right = -5.0
+offset_bottom = -5.0
+mouse_filter = 2
+color = Color(0, 0, 0, 0.6)
+
+[node name="Key" type="Label" parent="Anchor/Slots/SlotE"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 6.0
+offset_top = -26.0
+offset_right = 26.0
+offset_bottom = -4.0
+mouse_filter = 2
+text = "E"
+label_settings = SubResource("LabelSettings_key")
+
+[node name="Cooldown" type="Label" parent="Anchor/Slots/SlotE"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+text = "0"
+label_settings = SubResource("LabelSettings_cd")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+; Bigger slot, gold frame, larger cooldown number.
+[node name="SlotR" type="Panel" parent="Anchor/Slots"]
+custom_minimum_size = Vector2(76, 76)
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_styles/panel = SubResource("StyleBoxFlat_ult")
+script = ExtResource("2_slot")
+Action = "ability_r"
+IconPath = NodePath("Icon")
+KeyLabelPath = NodePath("Key")
+CooldownLabelPath = NodePath("Cooldown")
+CooldownOverlayPath = NodePath("Overlay")
+ReadyColor = Color(0.85, 0.5, 0.12, 1)
+CooldownColor = Color(0.22, 0.16, 0.08, 1)
+
+[node name="Icon" type="ColorRect" parent="Anchor/Slots/SlotR"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 7.0
+offset_top = 7.0
+offset_right = -7.0
+offset_bottom = -7.0
+mouse_filter = 2
+color = Color(0.85, 0.5, 0.12, 1)
+
+[node name="Overlay" type="ColorRect" parent="Anchor/Slots/SlotR"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 7.0
+offset_top = 7.0
+offset_right = -7.0
+offset_bottom = -7.0
+mouse_filter = 2
+color = Color(0, 0, 0, 0.6)
+
+[node name="Key" type="Label" parent="Anchor/Slots/SlotR"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = -28.0
+offset_right = 30.0
+offset_bottom = -4.0
+mouse_filter = 2
+text = "R"
+label_settings = SubResource("LabelSettings_key")
+
+[node name="Cooldown" type="Label" parent="Anchor/Slots/SlotR"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+text = "0"
+label_settings = SubResource("LabelSettings_cd_ult")
+horizontal_alignment = 1
+vertical_alignment = 1

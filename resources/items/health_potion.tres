@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="InventoryItem" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/Systems/InventoryItem.cs" id="1_potion"]
+
+[resource]
+script = ExtResource("1_potion")
+Id = "health_potion"
+DisplayName = "Health Potion"
+Description = "Restores health when used."
+Stackable = true
+MaxStack = 99

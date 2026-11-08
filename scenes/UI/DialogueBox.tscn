@@ -1,0 +1,35 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/UI/DialogueBox.cs" id="1_dialogue"]
+
+[node name="DialogueBox" type="CanvasLayer"]
+process_mode = 3
+script = ExtResource("1_dialogue")
+PanelPath = NodePath("Panel")
+NameLabelPath = NodePath("Panel/VBox/NameLabel")
+TextLabelPath = NodePath("Panel/VBox/TextLabel")
+
+[node name="Panel" type="Panel" parent="."]
+anchor_left = 0.1
+anchor_top = 0.75
+anchor_right = 0.9
+anchor_bottom = 0.95
+
+[node name="VBox" type="VBoxContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 8.0
+offset_right = -12.0
+offset_bottom = -8.0
+
+[node name="NameLabel" type="Label" parent="Panel/VBox"]
+layout_mode = 2
+text = "Name"
+
+[node name="TextLabel" type="Label" parent="Panel/VBox"]
+layout_mode = 2
+autowrap_mode = 3
+text = "Dialogue text goes here."

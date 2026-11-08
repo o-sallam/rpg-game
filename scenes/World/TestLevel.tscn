@@ -1,0 +1,80 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/Player.tscn" id="1_player"]
+[ext_resource type="PackedScene" path="res://scenes/NPC.tscn" id="2_npc"]
+[ext_resource type="PackedScene" path="res://scenes/ItemPickup.tscn" id="3_pickup"]
+[ext_resource type="PackedScene" path="res://scenes/UI/HUD.tscn" id="4_hud"]
+[ext_resource type="PackedScene" path="res://scenes/UI/DialogueBox.tscn" id="5_dialogue"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_h_wall"]
+size = Vector2(800, 32)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_v_wall"]
+size = Vector2(32, 600)
+
+[node name="TestLevel" type="Node2D"]
+
+[node name="Walls" type="Node2D" parent="."]
+
+[node name="TopWall" type="StaticBody2D" parent="Walls"]
+position = Vector2(400, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Polygon2D" type="Polygon2D" parent="Walls/TopWall"]
+color = Color(0.35, 0.35, 0.4, 1)
+polygon = PackedVector2Array(-400, -16, 400, -16, 400, 16, -400, 16)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/TopWall"]
+shape = SubResource("RectangleShape2D_h_wall")
+
+[node name="BottomWall" type="StaticBody2D" parent="Walls"]
+position = Vector2(400, 600)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Polygon2D" type="Polygon2D" parent="Walls/BottomWall"]
+color = Color(0.35, 0.35, 0.4, 1)
+polygon = PackedVector2Array(-400, -16, 400, -16, 400, 16, -400, 16)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/BottomWall"]
+shape = SubResource("RectangleShape2D_h_wall")
+
+[node name="LeftWall" type="StaticBody2D" parent="Walls"]
+position = Vector2(0, 300)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Polygon2D" type="Polygon2D" parent="Walls/LeftWall"]
+color = Color(0.35, 0.35, 0.4, 1)
+polygon = PackedVector2Array(-16, -300, 16, -300, 16, 300, -16, 300)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/LeftWall"]
+shape = SubResource("RectangleShape2D_v_wall")
+
+[node name="RightWall" type="StaticBody2D" parent="Walls"]
+position = Vector2(800, 300)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Polygon2D" type="Polygon2D" parent="Walls/RightWall"]
+color = Color(0.35, 0.35, 0.4, 1)
+polygon = PackedVector2Array(-16, -300, 16, -300, 16, 300, -16, 300)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/RightWall"]
+shape = SubResource("RectangleShape2D_v_wall")
+
+[node name="Player" parent="." instance=ExtResource("1_player")]
+position = Vector2(400, 300)
+
+[node name="NPC" parent="." instance=ExtResource("2_npc")]
+position = Vector2(480, 300)
+NpcName = "Old Man"
+DialogueText = "Welcome to the village, traveler. Press E near anyone or anything to interact."
+
+[node name="HealthPotionPickup" parent="." instance=ExtResource("3_pickup")]
+position = Vector2(320, 220)
+
+[node name="HUD" parent="." instance=ExtResource("4_hud")]
+
+[node name="DialogueBox" parent="." instance=ExtResource("5_dialogue")]

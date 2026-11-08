@@ -1,0 +1,32 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/UI/HUD.cs" id="1_hud"]
+
+[node name="HUD" type="CanvasLayer"]
+script = ExtResource("1_hud")
+HealthBarPath = NodePath("Margin/VBox/HealthBar")
+LevelLabelPath = NodePath("Margin/VBox/LevelLabel")
+
+[node name="Margin" type="MarginContainer" parent="."]
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 216.0
+offset_bottom = 64.0
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="VBox" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+
+[node name="LevelLabel" type="Label" parent="Margin/VBox"]
+layout_mode = 2
+text = "Lv. 1"
+
+[node name="HealthBar" type="ProgressBar" parent="Margin/VBox"]
+layout_mode = 2
+min_value = 0.0
+max_value = 100.0
+value = 100.0
+show_percentage = false

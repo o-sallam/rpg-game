@@ -1,0 +1,42 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/UI/HealthBar.cs" id="1_healthbar"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_back"]
+albedo_color = Color(0.08, 0.08, 0.1, 0.85)
+shading_mode = 0
+transparency = 1
+cull_mode = 2
+no_depth_test = true
+
+[sub_resource type="QuadMesh" id="QuadMesh_back"]
+material = SubResource("StandardMaterial3D_back")
+size = Vector2(1.06, 0.16)
+
+[sub_resource type="QuadMesh" id="QuadMesh_fill"]
+size = Vector2(1, 0.1)
+
+[node name="HealthBar" type="Node3D"]
+script = ExtResource("1_healthbar")
+HealthPath = NodePath("")
+FillPath = NodePath("Fill")
+LabelPath = NodePath("Label")
+BarWidth = 1.0
+ShowLabel = true
+HideWhenDead = true
+
+[node name="Background" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.005)
+mesh = SubResource("QuadMesh_back")
+
+[node name="Fill" type="MeshInstance3D" parent="."]
+mesh = SubResource("QuadMesh_fill")
+
+[node name="Label" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.19, 0)
+pixel_size = 0.0025
+billboard = 1
+no_depth_test = true
+text = "100 / 100"
+font_size = 48
+outline_size = 12

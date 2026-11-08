@@ -1,0 +1,564 @@
+[gd_scene load_steps=39 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/Player3D.tscn" id="1_player"]
+[ext_resource type="Script" path="res://scripts/Camera/IsometricCamera.cs" id="2_camera"]
+[ext_resource type="Script" path="res://scripts/World/GroundClickDetector.cs" id="3_click"]
+[ext_resource type="PackedScene" path="res://scenes/Monster.tscn" id="4_monster"]
+[ext_resource type="PackedScene" path="res://scenes/UI/AbilityBar.tscn" id="5_abilitybar"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
+sky_top_color = Color(0.36, 0.55, 0.84, 1)
+sky_horizon_color = Color(0.72, 0.81, 0.89, 1)
+ground_bottom_color = Color(0.28, 0.33, 0.28, 1)
+ground_horizon_color = Color(0.66, 0.73, 0.68, 1)
+
+[sub_resource type="Sky" id="Sky_env"]
+sky_material = SubResource("ProceduralSkyMaterial_sky")
+
+[sub_resource type="Environment" id="Environment_env"]
+background_mode = 2
+sky = SubResource("Sky_env")
+ambient_light_source = 3
+ambient_light_sky_contribution = 0.55
+ambient_light_energy = 1.1
+tonemap_mode = 2
+
+; --- materials -------------------------------------------------------------
+; Unshaded-ish stylised set: no metal, high roughness, flat colours. Cheap on
+; low-end GPUs and readable from a fixed isometric angle.
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_grass"]
+albedo_color = Color(0.36, 0.52, 0.28, 1)
+roughness = 0.9
+metallic_specular = 0.1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_backdrop"]
+albedo_color = Color(0.22, 0.32, 0.22, 1)
+roughness = 1.0
+metallic_specular = 0.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_path"]
+albedo_color = Color(0.66, 0.55, 0.36, 1)
+roughness = 0.95
+metallic_specular = 0.05
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bark"]
+albedo_color = Color(0.36, 0.25, 0.17, 1)
+roughness = 0.95
+metallic_specular = 0.05
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_leaf"]
+albedo_color = Color(0.27, 0.5, 0.24, 1)
+roughness = 0.9
+metallic_specular = 0.05
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pine"]
+albedo_color = Color(0.17, 0.36, 0.24, 1)
+roughness = 0.9
+metallic_specular = 0.05
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bush"]
+albedo_color = Color(0.33, 0.47, 0.22, 1)
+roughness = 0.9
+metallic_specular = 0.05
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rock"]
+albedo_color = Color(0.49, 0.5, 0.53, 1)
+roughness = 0.85
+metallic_specular = 0.15
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wood"]
+albedo_color = Color(0.62, 0.45, 0.28, 1)
+roughness = 0.9
+metallic_specular = 0.05
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_roof"]
+albedo_color = Color(0.55, 0.24, 0.2, 1)
+roughness = 0.85
+metallic_specular = 0.1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dark"]
+albedo_color = Color(0.2, 0.14, 0.1, 1)
+roughness = 1.0
+metallic_specular = 0.0
+
+; --- meshes and shapes, shared across every instance -----------------------
+
+[sub_resource type="BoxMesh" id="BoxMesh_ground"]
+material = SubResource("StandardMaterial3D_grass")
+size = Vector3(40, 0.5, 40)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ground"]
+size = Vector3(40, 0.5, 40)
+
+[sub_resource type="BoxMesh" id="BoxMesh_backdrop"]
+material = SubResource("StandardMaterial3D_backdrop")
+size = Vector3(90, 0.5, 90)
+
+[sub_resource type="BoxMesh" id="BoxMesh_path_main"]
+material = SubResource("StandardMaterial3D_path")
+size = Vector3(3, 0.06, 40)
+
+[sub_resource type="BoxMesh" id="BoxMesh_path_spur"]
+material = SubResource("StandardMaterial3D_path")
+size = Vector3(7, 0.06, 2.5)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_trunk"]
+material = SubResource("StandardMaterial3D_bark")
+top_radius = 0.2
+bottom_radius = 0.28
+height = 2.6
+radial_segments = 6
+rings = 1
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_trunk"]
+height = 2.6
+radius = 0.45
+
+[sub_resource type="SphereMesh" id="SphereMesh_canopy"]
+material = SubResource("StandardMaterial3D_leaf")
+radius = 1.6
+height = 3.0
+radial_segments = 8
+rings = 4
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_pine"]
+material = SubResource("StandardMaterial3D_pine")
+top_radius = 0.0
+bottom_radius = 1.5
+height = 3.6
+radial_segments = 7
+rings = 1
+
+[sub_resource type="SphereMesh" id="SphereMesh_rock"]
+material = SubResource("StandardMaterial3D_rock")
+radius = 0.7
+height = 1.4
+radial_segments = 6
+rings = 3
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_rock"]
+radius = 0.6
+
+[sub_resource type="SphereMesh" id="SphereMesh_bush"]
+material = SubResource("StandardMaterial3D_bush")
+radius = 0.55
+height = 0.9
+radial_segments = 7
+rings = 3
+
+[sub_resource type="BoxMesh" id="BoxMesh_hut"]
+material = SubResource("StandardMaterial3D_wood")
+size = Vector3(5, 3, 4.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_hut"]
+size = Vector3(5, 3, 4.5)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_hut_roof"]
+material = SubResource("StandardMaterial3D_roof")
+top_radius = 0.0
+bottom_radius = 3.6
+height = 1.8
+radial_segments = 4
+rings = 1
+
+[sub_resource type="BoxMesh" id="BoxMesh_hut_door"]
+material = SubResource("StandardMaterial3D_dark")
+size = Vector3(0.12, 2, 1.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_fence_rail"]
+material = SubResource("StandardMaterial3D_wood")
+size = Vector3(8, 0.16, 0.12)
+
+[sub_resource type="BoxMesh" id="BoxMesh_fence_post"]
+material = SubResource("StandardMaterial3D_wood")
+size = Vector3(0.18, 1.2, 0.18)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_fence"]
+size = Vector3(8, 1.2, 0.3)
+
+[node name="Main3D" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_env")
+
+[node name="Lighting" type="Node3D" parent="."]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Lighting"]
+transform = Transform3D(0.707107, -0.456191, 0.539773, 0, 0.764842, 0.644219, -0.707107, -0.456191, 0.539773, 8, 12, 8)
+light_energy = 1.15
+shadow_enabled = true
+shadow_blur = 1.5
+directional_shadow_max_distance = 60.0
+
+[node name="Environment" type="Node3D" parent="."]
+
+; The playable surface. Layer 1 ("world") is what GroundClickDetector rays
+; against and what the player body collides with.
+[node name="Ground" type="StaticBody3D" parent="Environment"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/Ground"]
+mesh = SubResource("BoxMesh_ground")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Ground"]
+shape = SubResource("BoxShape3D_ground")
+
+; Darker surround with no collider: it frames the play area visually and, since
+; rays miss it, right-clicking off the map simply does nothing.
+[node name="Backdrop" type="MeshInstance3D" parent="Environment"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.65, 0)
+mesh = SubResource("BoxMesh_backdrop")
+
+; Paths are thin decals sitting 3cm over the grass - no colliders, so ground
+; clicks land on the ground itself.
+[node name="Path" type="Node3D" parent="Environment"]
+
+[node name="MainRoad" type="MeshInstance3D" parent="Environment/Path"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, 0)
+mesh = SubResource("BoxMesh_path_main")
+
+[node name="HutSpur" type="MeshInstance3D" parent="Environment/Path"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 0.01, -8)
+mesh = SubResource("BoxMesh_path_spur")
+
+; Trees: trunk collides, canopy does not. That keeps the silhouette from
+; swallowing clicks - a ray through the leaves still reaches the ground.
+[node name="Trees" type="Node3D" parent="Environment"]
+
+[node name="Tree1" type="StaticBody3D" parent="Environment/Trees"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, -6)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Trunk" type="MeshInstance3D" parent="Environment/Trees/Tree1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
+mesh = SubResource("CylinderMesh_trunk")
+
+[node name="Canopy" type="MeshInstance3D" parent="Environment/Trees/Tree1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.4, 0)
+mesh = SubResource("SphereMesh_canopy")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Trees/Tree1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
+shape = SubResource("CylinderShape3D_trunk")
+
+[node name="Tree2" type="StaticBody3D" parent="Environment/Trees"]
+transform = Transform3D(0.939693, 0, 0.34202, 0, 1, 0, -0.34202, 0, 0.939693, 11.5, 0, -1.5)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Trunk" type="MeshInstance3D" parent="Environment/Trees/Tree2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+mesh = SubResource("CylinderMesh_trunk")
+
+[node name="Canopy" type="MeshInstance3D" parent="Environment/Trees/Tree2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.4, 0)
+mesh = SubResource("CylinderMesh_pine")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Trees/Tree2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
+shape = SubResource("CylinderShape3D_trunk")
+
+[node name="Tree3" type="StaticBody3D" parent="Environment/Trees"]
+transform = Transform3D(0.866025, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866025, 13, 0, 5.5)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Trunk" type="MeshInstance3D" parent="Environment/Trees/Tree3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
+mesh = SubResource("CylinderMesh_trunk")
+
+[node name="Canopy" type="MeshInstance3D" parent="Environment/Trees/Tree3"]
+transform = Transform3D(1.1, 0, 0, 0, 1, 0, 0, 0, 1.1, 0, 3.5, 0)
+mesh = SubResource("SphereMesh_canopy")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Trees/Tree3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
+shape = SubResource("CylinderShape3D_trunk")
+
+[node name="Tree4" type="StaticBody3D" parent="Environment/Trees"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, 9.5)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Trunk" type="MeshInstance3D" parent="Environment/Trees/Tree4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+mesh = SubResource("CylinderMesh_trunk")
+
+[node name="Canopy" type="MeshInstance3D" parent="Environment/Trees/Tree4"]
+transform = Transform3D(1.15, 0, 0, 0, 1.2, 0, 0, 0, 1.15, 0, 3.7, 0)
+mesh = SubResource("CylinderMesh_pine")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Trees/Tree4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
+shape = SubResource("CylinderShape3D_trunk")
+
+[node name="Tree5" type="StaticBody3D" parent="Environment/Trees"]
+transform = Transform3D(0.939693, 0, -0.34202, 0, 1, 0, 0.34202, 0, 0.939693, -7, 0, 10.5)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Trunk" type="MeshInstance3D" parent="Environment/Trees/Tree5"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
+mesh = SubResource("CylinderMesh_trunk")
+
+[node name="Canopy" type="MeshInstance3D" parent="Environment/Trees/Tree5"]
+transform = Transform3D(1, 0, 0, 0, 0.9, 0, 0, 0, 1, 0, 3.3, 0)
+mesh = SubResource("SphereMesh_canopy")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Trees/Tree5"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
+shape = SubResource("CylinderShape3D_trunk")
+
+[node name="Tree6" type="StaticBody3D" parent="Environment/Trees"]
+transform = Transform3D(0.866025, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866025, -12.5, 0, 3)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Trunk" type="MeshInstance3D" parent="Environment/Trees/Tree6"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+mesh = SubResource("CylinderMesh_trunk")
+
+[node name="Canopy" type="MeshInstance3D" parent="Environment/Trees/Tree6"]
+transform = Transform3D(1, 0, 0, 0, 1.1, 0, 0, 0, 1, 0, 3.5, 0)
+mesh = SubResource("CylinderMesh_pine")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Trees/Tree6"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
+shape = SubResource("CylinderShape3D_trunk")
+
+[node name="Tree7" type="StaticBody3D" parent="Environment/Trees"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 0, -4)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Trunk" type="MeshInstance3D" parent="Environment/Trees/Tree7"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
+mesh = SubResource("CylinderMesh_trunk")
+
+[node name="Canopy" type="MeshInstance3D" parent="Environment/Trees/Tree7"]
+transform = Transform3D(0.9, 0, 0, 0, 1, 0, 0, 0, 0.9, 0, 3.4, 0)
+mesh = SubResource("SphereMesh_canopy")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Trees/Tree7"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
+shape = SubResource("CylinderShape3D_trunk")
+
+; Rocks: the mesh carries the squash, the collider stays uniform - Godot does
+; not support non-uniform scale on collision shapes.
+[node name="Rocks" type="Node3D" parent="Environment"]
+
+[node name="Rock1" type="StaticBody3D" parent="Environment/Rocks"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 0.1, -10.5)
+collision_layer = 1
+collision_mask = 0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/Rocks/Rock1"]
+transform = Transform3D(1.2, 0, 0, 0, 0.7, 0, 0, 0, 1, 0, 0.15, 0)
+mesh = SubResource("SphereMesh_rock")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Rocks/Rock1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+shape = SubResource("SphereShape3D_rock")
+
+[node name="Rock2" type="StaticBody3D" parent="Environment/Rocks"]
+transform = Transform3D(0.866025, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866025, -4.5, 0.1, -13.8)
+collision_layer = 1
+collision_mask = 0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/Rocks/Rock2"]
+transform = Transform3D(0.9, 0, 0, 0, 0.8, 0, 0, 0, 1.1, 0, 0.2, 0)
+mesh = SubResource("SphereMesh_rock")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Rocks/Rock2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+shape = SubResource("SphereShape3D_rock")
+
+[node name="Rock3" type="StaticBody3D" parent="Environment/Rocks"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 0.1, 9)
+collision_layer = 1
+collision_mask = 0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/Rocks/Rock3"]
+transform = Transform3D(1.4, 0, 0, 0, 1, 0, 0, 0, 1.2, 0, 0.25, 0)
+mesh = SubResource("SphereMesh_rock")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Rocks/Rock3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+shape = SubResource("SphereShape3D_rock")
+
+[node name="Rock4" type="StaticBody3D" parent="Environment/Rocks"]
+transform = Transform3D(0.707107, 0, -0.707107, 0, 1, 0, 0.707107, 0, 0.707107, -15, 0.1, 7)
+collision_layer = 1
+collision_mask = 0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/Rocks/Rock4"]
+transform = Transform3D(1, 0, 0, 0, 0.9, 0, 0, 0, 1, 0, 0.2, 0)
+mesh = SubResource("SphereMesh_rock")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Rocks/Rock4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+shape = SubResource("SphereShape3D_rock")
+
+[node name="Rock5" type="StaticBody3D" parent="Environment/Rocks"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 0.1, 14)
+collision_layer = 1
+collision_mask = 0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/Rocks/Rock5"]
+transform = Transform3D(0.8, 0, 0, 0, 0.6, 0, 0, 0, 0.8, 0, 0.1, 0)
+mesh = SubResource("SphereMesh_rock")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Rocks/Rock5"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+shape = SubResource("SphereShape3D_rock")
+
+; Bushes are decoration only - no colliders, so the fox brushes through them
+; instead of snagging on knee-high geometry.
+[node name="Bushes" type="Node3D" parent="Environment"]
+
+[node name="Bush1" type="MeshInstance3D" parent="Environment/Bushes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, 0.3, -3.2)
+mesh = SubResource("SphereMesh_bush")
+
+[node name="Bush2" type="MeshInstance3D" parent="Environment/Bushes"]
+transform = Transform3D(1.2, 0, 0, 0, 0.9, 0, 0, 0, 1.2, -2.6, 0.28, 4.5)
+mesh = SubResource("SphereMesh_bush")
+
+[node name="Bush3" type="MeshInstance3D" parent="Environment/Bushes"]
+transform = Transform3D(0.9, 0, 0, 0, 1.1, 0, 0, 0, 0.9, 5.5, 0.32, 6.5)
+mesh = SubResource("SphereMesh_bush")
+
+[node name="Bush4" type="MeshInstance3D" parent="Environment/Bushes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.4, 0.3, -6.5)
+mesh = SubResource("SphereMesh_bush")
+
+; The hut sits at the end of the spur path, door facing the road.
+[node name="Building" type="Node3D" parent="Environment"]
+
+[node name="Hut" type="StaticBody3D" parent="Environment/Building"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 0, -8)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Walls" type="MeshInstance3D" parent="Environment/Building/Hut"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+mesh = SubResource("BoxMesh_hut")
+
+[node name="Roof" type="MeshInstance3D" parent="Environment/Building/Hut"]
+transform = Transform3D(0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, 0.707107, 0, 3.9, 0)
+mesh = SubResource("CylinderMesh_hut_roof")
+
+[node name="Door" type="MeshInstance3D" parent="Environment/Building/Hut"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 1, 0)
+mesh = SubResource("BoxMesh_hut_door")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Building/Hut"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+shape = SubResource("BoxShape3D_hut")
+
+; Two fence runs with a gap where the road passes through.
+[node name="Fences" type="Node3D" parent="Environment"]
+
+[node name="FenceWest" type="StaticBody3D" parent="Environment/Fences"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, -13)
+collision_layer = 1
+collision_mask = 0
+
+[node name="RailLow" type="MeshInstance3D" parent="Environment/Fences/FenceWest"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+mesh = SubResource("BoxMesh_fence_rail")
+
+[node name="RailHigh" type="MeshInstance3D" parent="Environment/Fences/FenceWest"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)
+mesh = SubResource("BoxMesh_fence_rail")
+
+[node name="Post1" type="MeshInstance3D" parent="Environment/Fences/FenceWest"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.9, 0.6, 0)
+mesh = SubResource("BoxMesh_fence_post")
+
+[node name="Post2" type="MeshInstance3D" parent="Environment/Fences/FenceWest"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3, 0.6, 0)
+mesh = SubResource("BoxMesh_fence_post")
+
+[node name="Post3" type="MeshInstance3D" parent="Environment/Fences/FenceWest"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3, 0.6, 0)
+mesh = SubResource("BoxMesh_fence_post")
+
+[node name="Post4" type="MeshInstance3D" parent="Environment/Fences/FenceWest"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.9, 0.6, 0)
+mesh = SubResource("BoxMesh_fence_post")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Fences/FenceWest"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+shape = SubResource("BoxShape3D_fence")
+
+[node name="FenceEast" type="StaticBody3D" parent="Environment/Fences"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, -13)
+collision_layer = 1
+collision_mask = 0
+
+[node name="RailLow" type="MeshInstance3D" parent="Environment/Fences/FenceEast"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+mesh = SubResource("BoxMesh_fence_rail")
+
+[node name="RailHigh" type="MeshInstance3D" parent="Environment/Fences/FenceEast"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)
+mesh = SubResource("BoxMesh_fence_rail")
+
+[node name="Post1" type="MeshInstance3D" parent="Environment/Fences/FenceEast"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.9, 0.6, 0)
+mesh = SubResource("BoxMesh_fence_post")
+
+[node name="Post2" type="MeshInstance3D" parent="Environment/Fences/FenceEast"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3, 0.6, 0)
+mesh = SubResource("BoxMesh_fence_post")
+
+[node name="Post3" type="MeshInstance3D" parent="Environment/Fences/FenceEast"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3, 0.6, 0)
+mesh = SubResource("BoxMesh_fence_post")
+
+[node name="Post4" type="MeshInstance3D" parent="Environment/Fences/FenceEast"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.9, 0.6, 0)
+mesh = SubResource("BoxMesh_fence_post")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Fences/FenceEast"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+shape = SubResource("BoxShape3D_fence")
+
+[node name="Player3D" parent="." instance=ExtResource("1_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+
+; Spaced well apart and all further than the 6m aggro range from spawn, so the
+; fight starts when the player chooses to walk over.
+[node name="Monsters" type="Node3D" parent="."]
+
+[node name="Monster1" parent="Monsters" instance=ExtResource("4_monster")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 8, 0.1, 0)
+
+[node name="Monster2" parent="Monsters" instance=ExtResource("4_monster")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0.1, 8)
+
+[node name="Monster3" parent="Monsters" instance=ExtResource("4_monster")]
+transform = Transform3D(0.707107, 0, -0.707107, 0, 1, 0, 0.707107, 0, 0.707107, 2, 0.1, -9)
+
+[node name="IsometricCamera" type="Camera3D" parent="."]
+transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 10, 10, 10)
+projection = 1
+size = 12.0
+script = ExtResource("2_camera")
+TargetPath = NodePath("../Player3D")
+YawDegrees = 45.0
+PitchDegrees = -45.0
+Distance = 20.0
+OrthographicSize = 12.0
+
+[node name="GroundClickDetector" type="Node3D" parent="."]
+script = ExtResource("3_click")
+CameraPath = NodePath("../IsometricCamera")
+
+[node name="AbilityBar" parent="." instance=ExtResource("5_abilitybar")]
+AbilitySystemPath = NodePath("../Player3D/AbilitySystem")
